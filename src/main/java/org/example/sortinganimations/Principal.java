@@ -18,9 +18,10 @@ public class Principal extends Application {
     AnchorPane pane;
     Button botao_inicio;
     private Button vet[];
-    private int TL = 5;
+    private int TL = 10;
 
-    private boolean animationIsRunning = false;
+    private Task tasks [] = new Task[1000];
+    private int TaskTL = 0;
 
     public static void main(String[] args)
     {
@@ -61,6 +62,7 @@ public class Principal extends Application {
         botao_inicio.setOnAction(e->{
             try {
                 shell_sort();
+                runTasks();
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -79,6 +81,20 @@ public class Principal extends Application {
         Scene scene = new Scene(pane, 800, 600);
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void runTasks(){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                for (int i = 0; i < TaskTL; i++) {
+                    tasks[i].run();
+                }
+                return null;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
     public void move_botoes(int j, int k)
     {
@@ -119,7 +135,7 @@ public class Principal extends Application {
                 return null;
             }
         };
-        Thread thread = new Thread(task);
-        thread.start();
+        tasks[TaskTL] = task;
+        TaskTL++;
     }
 }
