@@ -54,7 +54,7 @@ public class Principal extends Application {
         pane.getChildren().add(botao_inicio);
         vet = new Button[TL];
         for (int i = 0; i < TL; i++) {
-            vet[i] = new Button(new String(String.valueOf(new Random().nextInt(50))));
+            vet[i] = new Button(new String(String.valueOf(new Random().nextInt(25))));
             vet[i].setLayoutX(100 + (80 * i));
             vet[i].setLayoutY(200 + (20));
             vet[i].setMinHeight(40);
@@ -78,8 +78,28 @@ public class Principal extends Application {
         return vet;
     }
 
+    public void colorSuccess(){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                for (int i = 0; i < TL; i++) {
+                    vet[i].setStyle("-fx-background-color: green");
+                }
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public boolean iráTrocar(int i, int j) {
+        return inMemory[i] < inMemory[j];
+    }
+
+
     public void shell_sort() throws InterruptedException {
         int dist = 1, j, aux, aux2, acumulatedDist;
+        boolean trocou = false;
         while (dist < TL) {
             dist = dist * 3 + 1;
         }
@@ -87,24 +107,32 @@ public class Principal extends Application {
 
         while (dist > 0) {
             for (int i = dist; i < TL; i++) {
+                trocou = false;
                 vet = reorganizeVet();
                 j = i;
                 aux2 = inMemory[i];
                 acumulatedDist = 0;
                 aux = j;
                 colorir(j, j - dist);
-                separaAux(j);
+                if(iráTrocar(j, j - dist)){
+                    separaAux(j);
+                    trocou = true;
+                }
                 while (j - dist >= 0 && aux2 < inMemory[j- dist]) {
+                    if(aux != j){
+                        colorir(aux, j - dist);
+                    }
                     andaComOAnterior(j-dist, dist);
                     inMemory[j] = inMemory[j - dist];
                     acumulatedDist += dist;
                     j -= dist;
                 }
                 inMemory[j] = aux2;
-                retornaOAux(aux, acumulatedDist);
+                if(trocou) retornaOAux(aux, acumulatedDist);
             }
             dist = dist / 3;
         }
+        colorSuccess();
         runTasks();
     }
 
@@ -112,8 +140,8 @@ public class Principal extends Application {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() {
-                vet[i].setStyle("-fx-background-color: green");
-                vet[j].setStyle("-fx-background-color: green");
+                vet[i].setStyle("-fx-background-color: blue");
+                vet[j].setStyle("-fx-background-color: blue");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -135,7 +163,7 @@ public class Principal extends Application {
                 for (int i = 0; i < 20; i++) {
                     Platform.runLater(() -> vet[j].setLayoutY(vet[j].getLayoutY() + 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -152,10 +180,10 @@ public class Principal extends Application {
             @Override
             protected Void call() {
                 int j = currentJ;
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 20; i++) {
                     Platform.runLater(() -> vet[j].setLayoutY(vet[j].getLayoutY() - 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -163,15 +191,15 @@ public class Principal extends Application {
                 for (int i = 0; i < 16 * dist; i++) {
                     Platform.runLater(() -> vet[j].setLayoutX(vet[j].getLayoutX() + 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 20; i++) {
                     Platform.runLater(() -> vet[j].setLayoutY(vet[j].getLayoutY() + 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -192,7 +220,7 @@ public class Principal extends Application {
                 for (int i = 0; i < 16 * dist; i++) {
                     Platform.runLater(() -> vet[j].setLayoutX(vet[j].getLayoutX() - 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -200,7 +228,7 @@ public class Principal extends Application {
                 for (int i = 0; i < 20; i++) {
                     Platform.runLater(() -> vet[j].setLayoutY(vet[j].getLayoutY() - 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -235,7 +263,7 @@ public class Principal extends Application {
                     Platform.runLater(() -> vet[j].setLayoutY(vet[j].getLayoutY() + 5));
                     Platform.runLater(() -> vet[k].setLayoutY(vet[k].getLayoutY() - 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -245,7 +273,7 @@ public class Principal extends Application {
                     Platform.runLater(() -> vet[j].setLayoutX(vet[j].getLayoutX() + 5));
                     Platform.runLater(() -> vet[k].setLayoutX(vet[k].getLayoutX() - 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -254,7 +282,7 @@ public class Principal extends Application {
                     Platform.runLater(() -> vet[j].setLayoutY(vet[j].getLayoutY() - 5));
                     Platform.runLater(() -> vet[k].setLayoutY(vet[k].getLayoutY() + 5));
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(25);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
