@@ -1,26 +1,27 @@
 package org.example.sortinganimations;
-import javafx.animation.SequentialTransition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
 
 public class Principal extends Application {
     AnchorPane pane;
     Button botao_inicio;
     private Button vet[];
     private int TL = 10;
+
+    private VBox codeContainer = new VBox(5);
+    private int highlightedLine = 0;
 
     private int [] inMemory = new int[1000];
 
@@ -33,6 +34,65 @@ public class Principal extends Application {
 
     private int parseInt(String num) {
         return Integer.parseInt(num);
+    }
+
+    private void renderCodeBox(){
+        String [] codeLines = {
+                "public void shell_sort() {", //0
+                "    int dist = 1, i, j, aux;", //1
+                "", //2
+                "    while (dist < TL) {", //3
+                "        dist = dist * 3 + 1;", //4
+                "    }", //5
+                "    dist /= 3;", //6
+                "", //7
+                "    while (dist > 0) {", //8
+                "        for (i = dist; i < TL; i++) {", //9
+                "            aux = array[i];", //10
+                "            j = i;", //11
+                "            while (j - dist >= 0 && aux < array[j - dist]) {", //12
+                "                array[j] = array[j - dist];", //13
+                "                j = j - dist;", //14
+                "            }", //15
+                "            array[j] = aux;", //16
+                "        }", //17
+                "        dist /= 3;", //18
+                "    }", //19
+                "}" //20
+        };
+
+        for(String line : codeLines){
+            Label label = new Label(line);
+            label.setFont(new Font(20));
+            codeContainer.getChildren().add(label);
+        }
+    }
+
+    private void clearHighlight(){
+        for(int i = 0; i < codeContainer.getChildren().size(); i++){
+            Label label = (Label) codeContainer.getChildren().get(i);
+            label.setStyle("-fx-background-color: #FFFFFF");
+        }
+    }
+
+    private void highlightLine(int line){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                clearHighlight();
+                Label label = (Label) codeContainer.getChildren().get(line);
+                label.setStyle("-fx-background-color: yellow");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            };
+        };
+
+        tasks[TaskTL] = task;
+        TaskTL++;
     }
 
     @Override
@@ -62,7 +122,11 @@ public class Principal extends Application {
             vet[i].setFont(new Font(14));
             pane.getChildren().add(vet[i]);
         }
-        Scene scene = new Scene(pane, 800, 600);
+        renderCodeBox();
+        codeContainer.setLayoutX(1000);
+        codeContainer.setLayoutY(100);
+        pane.getChildren().add(codeContainer);
+        Scene scene = new Scene(pane, 1280, 1080);
         stage.setScene(scene);
         stage.show();
     }
@@ -92,56 +156,65 @@ public class Principal extends Application {
         TaskTL++;
     }
 
-    public boolean iráTrocar(int i, int j) {
-        return inMemory[i] < inMemory[j];
-    }
-
-
     public void shell_sort() throws InterruptedException {
+        highlightLine(1);
         int dist = 1, j, aux, aux2, acumulatedDist;
         boolean trocou = false;
         while (dist < TL) {
+            highlightLine(3);
             dist = dist * 3 + 1;
+            highlightLine(4);
         }
+        highlightLine(5);
         dist = dist / 3;
+        highlightLine(6);
 
         while (dist > 0) {
+            highlightLine(8);
+            highlightLine(9);
             for (int i = dist; i < TL; i++) {
-                trocou = false;
+                highlightLine(9);
                 vet = reorganizeVet();
                 j = i;
+                highlightLine(10);
                 aux2 = inMemory[i];
+                separaAux(j);
                 acumulatedDist = 0;
+                highlightLine(11);
                 aux = j;
-                colorir(j, j - dist);
-                if(iráTrocar(j, j - dist)){
-                    separaAux(j);
-                    trocou = true;
-                }
+                highlightLine(12);
+                colorir(j, j - dist, "yellow");
                 while (j - dist >= 0 && aux2 < inMemory[j- dist]) {
-                    if(aux != j){
-                        colorir(aux, j - dist);
-                    }
+                    highlightLine(12);
+                    colorir(aux, j - dist, "green");
+                    highlightLine(13);
                     andaComOAnterior(j-dist, dist);
                     inMemory[j] = inMemory[j - dist];
                     acumulatedDist += dist;
+                    highlightLine(14);
                     j -= dist;
                 }
+                highlightLine(12);
+                if(j-dist >= 0){
+                    colorir(aux, j - dist, "red");
+                }
+                highlightLine(16);
                 inMemory[j] = aux2;
-                if(trocou) retornaOAux(aux, acumulatedDist);
+                retornaOAux(aux, acumulatedDist);
             }
+            highlightLine(18);
             dist = dist / 3;
         }
         colorSuccess();
         runTasks();
     }
 
-    public void colorir(int i, int j) {
+    public void colorir(int i, int j, String color) {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() {
-                vet[i].setStyle("-fx-background-color: blue");
-                vet[j].setStyle("-fx-background-color: blue");
+                vet[i].setStyle("-fx-background-color: " + color);
+                vet[j].setStyle("-fx-background-color: " + color);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
