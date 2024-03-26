@@ -19,7 +19,8 @@ import java.util.Random;
 
 public class Principal extends Application {
     AnchorPane pane;
-    Button botao_inicio;
+    Button botao_shell;
+    Button botao_counting;
     private Button vet[];
     private int TL = 10;
     private VBox codeContainer = new VBox(5);
@@ -39,31 +40,9 @@ public class Principal extends Application {
         return Integer.parseInt(num);
     }
 
-    private void renderCodeBox(){
-        String [] codeLines = {
-                "public void shell_sort() {", //0
-                "    int dist = 1, i, j, aux;", //1
-                "", //2
-                "    while (dist < TL) {", //3
-                "        dist = dist * 3 + 1;", //4
-                "    }", //5
-                "    dist /= 3;", //6
-                "", //7
-                "    while (dist > 0) {", //8
-                "        for (i = dist; i < TL; i++) {", //9
-                "            aux = array[i];", //10
-                "            j = i;", //11
-                "            while (j - dist >= 0 && aux < array[j - dist]) {", //12
-                "                array[j] = array[j - dist];", //13
-                "                j = j - dist;", //14
-                "            }", //15
-                "            array[j] = aux;", //16
-                "        }", //17
-                "        dist /= 3;", //18
-                "    }", //19
-                "}" //20
-        };
-
+    private void renderCodeBox(String method){
+        CodeBox codeBox = new CodeBox(method);
+        String[] codeLines = codeBox.getCodeLines();
         for(String line : codeLines){
             Label label = new Label(line);
             label.setFont(new Font(20));
@@ -99,37 +78,10 @@ public class Principal extends Application {
         TaskTL++;
     }
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        stage.setTitle("Pesquisa e Ordenacao");
-        pane = new AnchorPane();
-        botao_inicio = new Button();
-        botao_inicio.setLayoutX(100);
-        botao_inicio.setLayoutY(100);
-        botao_inicio.setText("Shell sort");
-        botao_inicio.setOnAction(e -> {
-            try {
-                toInMemory();
-                shell_sort();
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        pane.getChildren().add(botao_inicio);
-        vet = new Button[TL];
-        for (int i = 0; i < TL; i++) {
-            vet[i] = new Button(new String(String.valueOf(new Random().nextInt(25))));
-            vet[i].setLayoutX(100 + (80 * i));
-            vet[i].setLayoutY(200 + (20));
-            vet[i].setMinHeight(40);
-            vet[i].setMinWidth(40);
-            vet[i].setFont(new Font(14));
-            pane.getChildren().add(vet[i]);
-        }
-        renderCodeBox();
+    public void setupCodeContainer(int frameHeight){
         Rectangle frame = new Rectangle();
         frame.setWidth(500);
-        frame.setHeight(700);
+        frame.setHeight(frameHeight);
         frame.setFill(Color.BLACK);
         frame.setLayoutX(950);
         frame.setLayoutY(80);
@@ -142,7 +94,66 @@ public class Principal extends Application {
         codeContainer.setLayoutX(1000);
         codeContainer.setLayoutY(100);
         pane.getChildren().add(group);
+    }
+
+
+    public void setupShell(){
+        renderCodeBox("ShellSort");
+        setupCodeContainer(700);
         inicializarLabels();
+    }
+
+    public void setupCounting(){
+        renderCodeBox("CountingSort");
+        setupCodeContainer(860);
+    }
+
+    public void createButtonArray(Button [] vet, int TL, int height, boolean isRandom){
+        for (int i = 0; i < TL; i++) {
+            if(isRandom){
+                vet[i] = new Button(String.valueOf(new Random().nextInt(10)));
+            } else {
+                vet[i] = new Button("0");
+            }
+            vet[i].setLayoutX(100 + (80 * i));
+            vet[i].setLayoutY(height);
+            vet[i].setMinHeight(40);
+            vet[i].setMinWidth(40);
+            vet[i].setFont(new Font(14));
+            pane.getChildren().add(vet[i]);
+        }
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        stage.setTitle("Pesquisa e Ordenacao");
+        pane = new AnchorPane();
+        botao_shell = new Button();
+        botao_shell.setLayoutX(100);
+        botao_shell.setLayoutY(50);
+        botao_shell.setText("Shell sort");
+        botao_shell.setOnAction(e -> {
+            try {
+                setupShell();
+                toInMemory();
+                shell_sort();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        pane.getChildren().add(botao_shell);
+        botao_counting = new Button();
+        botao_counting.setLayoutX(100);
+        botao_counting.setLayoutY(100);
+        botao_counting.setText("Counting sort");
+        botao_counting.setOnAction(e -> {
+            setupCounting();
+            toInMemory();
+            counting_sort();
+        });
+        pane.getChildren().add(botao_counting);
+        vet = new Button[TL];
+        createButtonArray(vet, TL,220, true);
         Scene scene = new Scene(pane, 1280, 1080);
         stage.setScene(scene);
         stage.show();
@@ -232,6 +243,41 @@ public class Principal extends Application {
         }
         colorSuccess();
         runTasks();
+    }
+
+    public void counting_sort(){
+        Button [] BButton = new Button[100], CButton = new Button[100];
+        int major = 0, pos, posMaior = 0;
+        for (int i = 0; i < TL; i++){
+            colorir(i, posMaior, "yellow");
+            if (inMemory[i] > major){
+                major = inMemory[i];
+                posMaior = i;
+                colorir(i, posMaior, "green");
+            }
+        }
+
+        int [] B = new int[major + 1], C = new int[major + 1];
+
+        createButtonArrayTask(BButton, major, 400);
+        createButtonArrayTask(CButton, major, 600);
+
+
+        runTasks();
+    }
+
+    public void createButtonArrayTask(Button [] vet, int length, int height){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    createButtonArray(vet, length + 1, height, false);
+                });
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
     }
 
     public void colorir(int i, int j, String color) {
