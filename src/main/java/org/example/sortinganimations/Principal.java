@@ -120,7 +120,12 @@ public class Principal extends Application {
             vet[i].setMinHeight(40);
             vet[i].setMinWidth(40);
             vet[i].setFont(new Font(14));
+            Label label = new Label();
+            label.setText(String.valueOf("pos: " + i));
+            label.setLayoutX(100 + (80 * i));
+            label.setLayoutY(height + 40);
             pane.getChildren().add(vet[i]);
+            pane.getChildren().add(label);
         }
     }
 
@@ -216,10 +221,10 @@ public class Principal extends Application {
                 atribuiValorAoLabel(LabelJ, i);
                 aux = j;
                 highlightLine(12);
-                colorir(j, j - dist, "yellow");
+                colorir(j, j - dist, "yellow", vet);
                 while (j - dist >= 0 && aux2 < inMemory[j- dist]) {
                     highlightLine(12);
-                    colorir(aux, j - dist, "green");
+                    colorir(aux, j - dist, "green", vet);
                     highlightLine(13);
                     andaComOAnterior(j-dist, dist);
                     inMemory[j] = inMemory[j - dist];
@@ -230,7 +235,7 @@ public class Principal extends Application {
                 }
                 highlightLine(12);
                 if(j-dist >= 0){
-                    colorir(aux, j - dist, "red");
+                    colorir(aux, j - dist, "red", vet);
                 }
                 highlightLine(16);
                 inMemory[j] = aux2;
@@ -247,13 +252,13 @@ public class Principal extends Application {
 
     public void counting_sort(){
         Button [] BButton = new Button[100], CButton = new Button[100];
-        int major = 0, pos, posMaior = 0;
+        int major = 0, pos, posMaior = 0, value;
         for (int i = 0; i < TL; i++){
-            colorir(i, posMaior, "yellow");
+            colorir(i, posMaior, "yellow", vet);
             if (inMemory[i] > major){
                 major = inMemory[i];
                 posMaior = i;
-                colorir(i, posMaior, "green");
+                colorir(i, posMaior, "green", vet);
             }
         }
 
@@ -262,8 +267,54 @@ public class Principal extends Application {
         createButtonArrayTask(BButton, major, 400);
         createButtonArrayTask(CButton, major, 600);
 
+        for(int i = 0; i < TL; i++){
+            pos = inMemory[i];
+            value = inMemory[pos] + 1;
+            inMemory[pos] = value;
+            colorir(i,i, "yellow", vet);
+            incrementValue(BButton, i);
+        }
+
+        for(int i = 1; i < major + 1; i++){
+            colorir(i, i, "yellow", BButton);
+            acumulate(BButton, i);
+        }
+
 
         runTasks();
+    }
+
+    public void acumulate(Button [] arrayb, int i){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                       int value = parseInt(arrayb[i].getText()) + parseInt(arrayb[i - 1].getText());
+                       arrayb[i].setText(String.valueOf(value));
+                });
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public void incrementValue(Button [] arrayb, int i){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    int pos = parseInt(vet[i].getText());
+                    int value = parseInt(arrayb[pos].getText());
+                    value++;
+                    arrayb[pos].setText(String.valueOf(value));
+
+                });
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
     }
 
     public void createButtonArrayTask(Button [] vet, int length, int height){
@@ -280,7 +331,7 @@ public class Principal extends Application {
         TaskTL++;
     }
 
-    public void colorir(int i, int j, String color) {
+    public void colorir(int i, int j, String color, Button [] vet) {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() {
@@ -291,8 +342,8 @@ public class Principal extends Application {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                vet[i].setStyle("-fx-background-color: #FFFFFF");
-                vet[j].setStyle("-fx-background-color: #FFFFFF");
+                vet[i].setStyle("-fx-background-color: #E9E9E9");
+                vet[j].setStyle("-fx-background-color: #E9E9E9");
                 return null;
             }
         };
