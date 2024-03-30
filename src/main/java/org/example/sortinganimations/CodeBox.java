@@ -35,33 +35,31 @@ public class CodeBox {
         }
         else {
             codeLines = new String[] {
-                            "    public void counting_sort(){" ,
-                            "        //find the major" ,
-                            "        int major = 0, pos;" ,
-                            "        for(int i=0; i<TL; i,,){" ,
-                            "            if(array[i] > major){" ,
-                            "                major = array[i];" ,
-                            "            }" ,
-                            "        }" ,
-                            "        int [] B = new int[major , 1], C = new int[major , 1];" ,
-                            " " ,
-                            "        //count" ,
-                            "        for(int i=0; i<TL; i,,){" ,
-                            "            B[array[i]] ,= 1;" ,
-                            "        }" ,
-                            "" ,
-                            "        //cumulative" ,
-                            "        for(int i=1; i<=major; i,,){" ,
-                            "            B[i] = B[i] , B[i-1];" ,
-                            "        }" ,
-                            "" ,
-                            "        for(int i=TL-1; i >= 0; i--){" ,
-                            "            pos = B[array[i]];" ,
-                            "            B[array[i]] -= 1;" ,
-                            "            C[pos] = array[i];" ,
-                            "        }" ,
-                            "        array = C;" ,
-                            "    }",
+                            "    public void counting_sort(){" , //0
+                            " " , //1
+                            "        int major = 0, pos;" , //2
+                            "        for(int i=0; i<TL; i,,){" , //3
+                            "            if(array[i] > major){" , //4
+                            "                major = array[i];" , //5
+                            "            }" , //6
+                            "        }" , //7
+                            "        int [] B = new int[major , 1], C = new int[major , 1];" , //8
+                            " " , //9
+                            "        for(int i=0; i<TL; i,,){" , //10
+                            "            B[array[i]] += 1;" , //11
+                            "        }" , //12
+                            "" , //13
+                            "        for(int i=1; i<=major; i,,){" , //14
+                            "            B[i] = B[i] , B[i-1];" , //15
+                            "        }" , //16
+                            "" , //17
+                            "        for(int i=TL-1; i >= 0; i--){" , //18
+                            "            pos = B[array[i]];" , //19
+                            "            B[array[i]] -= 1;" , //20
+                            "            C[pos] = array[i];" , //21
+                            "        }" , //22
+                            "        array = C;" , //23
+                            "    }", //24
             };
         }
     }

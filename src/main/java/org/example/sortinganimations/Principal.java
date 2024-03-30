@@ -22,11 +22,14 @@ public class Principal extends Application {
     Button botao_shell;
     Button botao_counting;
     private Button vet[];
+    private Button BButton[];
+    private Button CButton[];
     private int TL = 10;
     private VBox codeContainer = new VBox(5);
     private int [] inMemory = new int[1000];
     private Task tasks[] = new Task[1000];
     private int TaskTL = 0;
+    private Label [] LabelPosB = new Label[TL];
     private Label LabelI = new Label();
     private Label LabelJ = new Label();
     private Label LabelAux = new Label();
@@ -108,7 +111,7 @@ public class Principal extends Application {
         setupCodeContainer(860);
     }
 
-    public void createButtonArray(Button [] vet, int TL, int height, boolean isRandom){
+    public void createButtonArray(Button [] vet, Label [] vetLabel, int TL, int height, boolean isRandom){
         for (int i = 0; i < TL; i++) {
             if(isRandom){
                 vet[i] = new Button(String.valueOf(new Random().nextInt(10)));
@@ -124,6 +127,7 @@ public class Principal extends Application {
             label.setText(String.valueOf("pos: " + i));
             label.setLayoutX(100 + (80 * i));
             label.setLayoutY(height + 40);
+            vetLabel[i] = label;
             pane.getChildren().add(vet[i]);
             pane.getChildren().add(label);
         }
@@ -158,7 +162,8 @@ public class Principal extends Application {
         });
         pane.getChildren().add(botao_counting);
         vet = new Button[TL];
-        createButtonArray(vet, TL,220, true);
+        Label [] vetLabel = new Label[TL];
+        createButtonArray(vet, vetLabel, TL,220, true);
         Scene scene = new Scene(pane, 1280, 1080);
         stage.setScene(scene);
         stage.show();
@@ -175,7 +180,7 @@ public class Principal extends Application {
         return vet;
     }
 
-    public void colorSuccess(){
+    public void colorSuccess(Button [] vet){
         Task <Void> task = new Task<Void>() {
             @Override
             protected Void call() {
@@ -246,42 +251,179 @@ public class Principal extends Application {
             atribuiValorAoLabel(LabelDist, dist/3);
             dist = dist / 3;
         }
-        colorSuccess();
+        colorSuccess(vet);
         runTasks();
     }
 
     public void counting_sort(){
-        Button [] BButton = new Button[100], CButton = new Button[100];
-        int major = 0, pos, posMaior = 0, value;
+        highlightLine(0);
+        BButton = new Button[100]; CButton = new Button[100];
+        Label [] vetLabelC = new Label[TL];
+        highlightLine(2);
+        int major = 0, pos, posMaior = 0, value, j;
+
+        highlightLine(3);
         for (int i = 0; i < TL; i++){
+            highlightLine(4);
             colorir(i, posMaior, "yellow", vet);
             if (inMemory[i] > major){
                 major = inMemory[i];
                 posMaior = i;
+                highlightLine(5);
                 colorir(i, posMaior, "green", vet);
             }
+            highlightLine(3);
         }
 
-        int [] B = new int[major + 1], C = new int[major + 1];
+        highlightLine(8);
+        int [] B = new int[major + 1];
 
-        createButtonArrayTask(BButton, major, 400);
-        createButtonArrayTask(CButton, major, 600);
+        createButtonArrayTask(BButton, LabelPosB, major, 400);
+        createButtonArrayTask(CButton, vetLabelC, TL - 1, 600);
 
+        highlightLine(10);
         for(int i = 0; i < TL; i++){
             pos = inMemory[i];
-            value = inMemory[pos] + 1;
-            inMemory[pos] = value;
-            colorir(i,i, "yellow", vet);
+            B[pos] = B[pos] + 1;
+            highlightLine(11);
+            tripleColor(vet,i, LabelPosB, pos, BButton, pos );
             incrementValue(BButton, i);
+            highlightLine(10);
         }
 
+        highlightLine(14);
         for(int i = 1; i < major + 1; i++){
+            highlightLine(15);
             colorir(i, i, "yellow", BButton);
             acumulate(BButton, i);
+            B[i] = B[i] + B[i - 1];
+            highlightLine(14);
         }
 
+        highlightLine(18);
+        for(int i = TL - 1; i >= 0; i--){
+            j = inMemory[i];
+            pos = B[j];
+            highlightLine(19);
+            tripleColor(vet, i, LabelPosB, j, CButton, pos - 1);
+            subtractValue(BButton, j);
+            highlightLine(20);
+            setNewValue(CButton, pos - 1, inMemory[i]);
+            highlightLine(21);
+            B[j] = B[j] - 1;
+            highlightLine(18);
+        }
 
+        remove(BButton, major + 1);
+
+        highlightLine(23);
+        for (int i = 0; i < TL; i++){
+            fromCToA(CButton, i);
+        }
+
+        colorSuccess(CButton);
+
+
+        highlightLine(24);
         runTasks();
+    }
+
+    public void remove(Button [] vet, int TL){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                for (int i = 0; i < TL; i++) {
+                    int finalI = i;
+                    Platform.runLater(() -> {
+                        pane.getChildren().remove(vet[finalI]);
+                        pane.getChildren().remove(LabelPosB[finalI]);
+                    });
+                }
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public void fromCToA(Button [] C, int pos){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                for (int i = 0; i < 76; i++) {
+                    Platform.runLater(() -> C[pos].setLayoutY(C[pos].getLayoutY() - 5));
+                    try {
+                        Thread.sleep(25);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public void subtractValue(Button [] vet, int pos){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    int value = parseInt(vet[pos].getText());
+                    value--;
+                    vet[pos].setText(String.valueOf(value));
+                });
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public void setNewValue(Button [] vet, int pos, int value){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    vet[pos].setText(String.valueOf(value));
+                });
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public void tripleColor(Button [] A, int i, Label [] B, int j, Button [] C, int k){
+        Task <Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                Platform.runLater(() -> {
+                    A[i].setStyle("-fx-background-color: yellow");
+                    B[j].setStyle("-fx-background-color: yellow");
+                    C[k].setStyle("-fx-background-color: yellow");
+                });
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Platform.runLater(() -> {
+                    A[i].setStyle("-fx-background-color: #E9E9E9");
+                    B[j].setStyle("-fx-background-color: #E9E9E9");
+                    C[k].setStyle("-fx-background-color: #E9E9E9");
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
     }
 
     public void acumulate(Button [] arrayb, int i){
@@ -317,12 +459,12 @@ public class Principal extends Application {
         TaskTL++;
     }
 
-    public void createButtonArrayTask(Button [] vet, int length, int height){
+    public void createButtonArrayTask(Button [] vet, Label [] vetLabel, int length, int height){
         Task <Void> task = new Task<Void>() {
             @Override
             protected Void call() {
                 Platform.runLater(() -> {
-                    createButtonArray(vet, length + 1, height, false);
+                    createButtonArray(vet, vetLabel, length + 1, height, false);
                 });
                 return null;
             }
@@ -344,6 +486,24 @@ public class Principal extends Application {
                 }
                 vet[i].setStyle("-fx-background-color: #E9E9E9");
                 vet[j].setStyle("-fx-background-color: #E9E9E9");
+                return null;
+            }
+        };
+        tasks[TaskTL] = task;
+        TaskTL++;
+    }
+
+    public void colorirLabel(int i, String color, Label [] vet) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() {
+                vet[i].setStyle("-fx-background-color: " + color);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                vet[i].setStyle("-fx-background-color: #E9E9E9");
                 return null;
             }
         };
