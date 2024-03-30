@@ -30,10 +30,10 @@ public class Principal extends Application {
     private Task tasks[] = new Task[1000];
     private int TaskTL = 0;
     private Label [] LabelPosB = new Label[TL];
-    private Label LabelI = new Label();
-    private Label LabelJ = new Label();
-    private Label LabelAux = new Label();
-    private Label LabelDist = new Label();
+    private Label Label1 = new Label();
+    private Label Label2 = new Label();
+    private Label Label3 = new Label();
+    private Label Label4 = new Label();
 
     public static void main(String[] args) {
         launch(args);
@@ -103,12 +103,13 @@ public class Principal extends Application {
     public void setupShell(){
         renderCodeBox("ShellSort");
         setupCodeContainer(700);
-        inicializarLabels();
+        inicializarLabels("i", "j", "aux", "dist");
     }
 
     public void setupCounting(){
         renderCodeBox("CountingSort");
         setupCodeContainer(860);
+        inicializarLabels("i", "major", "pos", "TL");
     }
 
     public void createButtonArray(Button [] vet, Label [] vetLabel, int TL, int height, boolean isRandom){
@@ -195,35 +196,36 @@ public class Principal extends Application {
     }
 
     public void shell_sort() throws InterruptedException {
+        atribuiValorAoLabel(Label4, 1);
         highlightLine(1);
         int dist = 1, j, aux, aux2, acumulatedDist;
         while (dist < TL) {
             highlightLine(3);
             dist = dist * 3 + 1;
             highlightLine(4);
-            atribuiValorAoLabel(LabelDist, dist * 3 + 1);
+            atribuiValorAoLabel(Label4, dist * 3 + 1);
         }
         highlightLine(5);
         dist = dist / 3;
         highlightLine(6);
-        atribuiValorAoLabel(LabelDist, dist);
+        atribuiValorAoLabel(Label4, dist);
 
 
         while (dist > 0) {
             highlightLine(8);
             highlightLine(9);
-            atribuiValorAoLabel(LabelI, dist);
+            atribuiValorAoLabel(Label1, dist);
             for (int i = dist; i < TL; i++) {
                 highlightLine(9);
                 vet = reorganizeVet();
                 j = i;
-                atribuiValorAoLabel(LabelAux, inMemory[i]);
+                atribuiValorAoLabel(Label3, inMemory[i]);
                 highlightLine(10);
                 aux2 = inMemory[i];
                 separaAux(j);
                 acumulatedDist = 0;
                 highlightLine(11);
-                atribuiValorAoLabel(LabelJ, i);
+                atribuiValorAoLabel(Label2, i);
                 aux = j;
                 highlightLine(12);
                 colorir(j, j - dist, "yellow", vet);
@@ -235,7 +237,7 @@ public class Principal extends Application {
                     inMemory[j] = inMemory[j - dist];
                     acumulatedDist += dist;
                     highlightLine(14);
-                    atribuiValorAoLabel(LabelJ, j - dist);
+                    atribuiValorAoLabel(Label2, j - dist);
                     j -= dist;
                 }
                 highlightLine(12);
@@ -245,10 +247,10 @@ public class Principal extends Application {
                 highlightLine(16);
                 inMemory[j] = aux2;
                 retornaOAux(aux, acumulatedDist);
-                atribuiValorAoLabel(LabelI, i+1);
+                atribuiValorAoLabel(Label1, i+1);
             }
             highlightLine(18);
-            atribuiValorAoLabel(LabelDist, dist/3);
+            atribuiValorAoLabel(Label4, dist/3);
             dist = dist / 3;
         }
         colorSuccess(vet);
@@ -257,12 +259,15 @@ public class Principal extends Application {
 
     public void counting_sort(){
         highlightLine(0);
+        atribuiValorAoLabel(Label4, TL);
         BButton = new Button[100]; CButton = new Button[100];
         Label [] vetLabelC = new Label[TL];
         highlightLine(2);
-        int major = 0, pos, posMaior = 0, value, j;
+        int major = 0, pos, posMaior = 0, j;
+        atribuiValorAoLabel(Label2, major);
 
         highlightLine(3);
+        atribuiValorAoLabel(Label1, 0);
         for (int i = 0; i < TL; i++){
             highlightLine(4);
             colorir(i, posMaior, "yellow", vet);
@@ -271,8 +276,10 @@ public class Principal extends Application {
                 posMaior = i;
                 highlightLine(5);
                 colorir(i, posMaior, "green", vet);
+                atribuiValorAoLabel(Label2, major);
             }
             highlightLine(3);
+            atribuiValorAoLabel(Label1, i + 1);
         }
 
         highlightLine(8);
@@ -283,6 +290,7 @@ public class Principal extends Application {
 
         highlightLine(10);
         for(int i = 0; i < TL; i++){
+            atribuiValorAoLabel(Label1, i);
             pos = inMemory[i];
             B[pos] = B[pos] + 1;
             highlightLine(11);
@@ -293,6 +301,7 @@ public class Principal extends Application {
 
         highlightLine(14);
         for(int i = 1; i < major + 1; i++){
+            atribuiValorAoLabel(Label1, i);
             highlightLine(15);
             colorir(i, i, "yellow", BButton);
             acumulate(BButton, i);
@@ -301,9 +310,11 @@ public class Principal extends Application {
         }
 
         highlightLine(18);
+        atribuiValorAoLabel(Label1, TL -1);
         for(int i = TL - 1; i >= 0; i--){
             j = inMemory[i];
             pos = B[j];
+            atribuiValorAoLabel(Label3, pos - 1);
             highlightLine(19);
             tripleColor(vet, i, LabelPosB, j, CButton, pos - 1);
             subtractValue(BButton, j);
@@ -312,6 +323,7 @@ public class Principal extends Application {
             highlightLine(21);
             B[j] = B[j] - 1;
             highlightLine(18);
+            atribuiValorAoLabel(Label1, i - 1);
         }
 
         remove(BButton, major + 1);
@@ -596,27 +608,27 @@ public class Principal extends Application {
         TaskTL++;
     }
 
-    private void inicializarLabels(){
-        LabelI.setFont(new Font(20));
-        LabelI.setLayoutY(350);
-        LabelI.setLayoutX(850);
-        LabelI.setText("i = 0");
-        LabelJ.setFont(new Font(20));
-        LabelJ.setLayoutY(400);
-        LabelJ.setLayoutX(850);
-        LabelJ.setText("j = 0");
-        LabelAux.setFont(new Font(20));
-        LabelAux.setLayoutY(450);
-        LabelAux.setLayoutX(850);
-        LabelAux.setText("aux = 0");
-        LabelDist.setFont(new Font(20));
-        LabelDist.setLayoutY(500);
-        LabelDist.setLayoutX(850);
-        LabelDist.setText("dist = 1");
-        pane.getChildren().add(LabelI);
-        pane.getChildren().add(LabelJ);
-        pane.getChildren().add(LabelAux);
-        pane.getChildren().add(LabelDist);
+    private void inicializarLabels(String label1, String label2, String label3, String label4){
+        Label1.setFont(new Font(20));
+        Label1.setLayoutY(350);
+        Label1.setLayoutX(1550);
+        Label1.setText(label1 + " = 0");
+        Label2.setFont(new Font(20));
+        Label2.setLayoutY(400);
+        Label2.setLayoutX(1550);
+        Label2.setText(label2 + " = 0");
+        Label3.setFont(new Font(20));
+        Label3.setLayoutY(450);
+        Label3.setLayoutX(1550);
+        Label3.setText(label3 + " = 0");
+        Label4.setFont(new Font(20));
+        Label4.setLayoutY(500);
+        Label4.setLayoutX(1550);
+        Label4.setText(label4 + " = 0");
+        pane.getChildren().add(Label1);
+        pane.getChildren().add(Label2);
+        pane.getChildren().add(Label3);
+        pane.getChildren().add(Label4);
     }
 
     private void atribuiValorAoLabel(Label label, int valor){
